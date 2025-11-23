@@ -1,0 +1,21 @@
+<h2>Поиск блюд</h2>
+
+<input id="query" placeholder="Введите блюдо" />
+<button onclick="search()">Найти</button>
+
+<div id="results"></div>
+
+<script>
+function search() {
+    const q = document.getElementById('query').value;
+    fetch(`/restaurants/search/?q=${q}`)
+        .then(r => r.json())
+        .then(data => {
+            const div = document.getElementById('results');
+            div.innerHTML = "";
+            data.results.forEach(r => {
+                div.innerHTML += `<p><b>${r.name}</b> — ${r.dish}</p>`;
+            })
+        });
+}
+</script>
