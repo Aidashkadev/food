@@ -1,21 +1,62 @@
-<h2>Поиск блюд</h2>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>FoodMap — поиск блюд</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f8f9fa; }
+        input[type=text] { padding: 12px; width: 300px; font-size: 18px; }
+        button { padding: 12px 20px; font-size: 18px; }
+        .crud { margin: 30px 0; padding: 20px; background: #e9ecef; border-radius: 10px; }
+        .result { margin: 15px 0; padding: 15px; background: white; border: 1px solid #ddd; border-radius: 8px; }
+    </style>
+</head>
+<body>
 
-<input id="query" placeholder="Введите блюдо" />
-<button onclick="search()">Найти</button>
+<h1>Найди своё блюдо</h1>
 
-<div id="results"></div>
+<input type="text" id="query" placeholder="пицца, борщ, суши..." autofocus>
+<button onclick="search()">Искать</button>
+
+<!-- КНОПКИ CRUD — ВОТ ОНИ! -->
+<div class="crud">
+    <h2>Управление</h2>
+    <a href="{% url 'restaurants:dish-add' %}">+ Добавить блюдо</a>  •  
+    <a href="{% url 'restaurants:dish-list' %}">Все блюда</a>
+</div>
+
+<div id="results">Начни вводить название блюда...</div>
 
 <script>
-function search() {
-    const q = document.getElementById('query').value;
-    fetch(`/restaurants/search/?q=${q}`)
-        .then(r => r.json())
-        .then(data => {
-            const div = document.getElementById('results');
-            div.innerHTML = "";
-            data.results.forEach(r => {
-                div.innerHTML += `<p><b>${r.name}</b> — ${r.dish}</p>`;
-            })
-        });
+async function search() {
+    const q = document.getElementById('query').value.trim();
+    const div = document.getElementById('results');
+    
+    if (!q) {
+        div.innerHTML = 'Введите название блюда';
+        return;
+    }
+
+    const resp = await fetch(`/search/?q=${encodeURIComponent(q)}`);
+    const dishes = await resp.json();
+
+    if (dishes.length === 0) {
+        div.innerHTML = '<p style="color: red;">Ничего не найдено</p>';
+        return;
+    }
+
+    div.innerHTML = dishes.map(d => `
+        <div class="result">
+            <strong>${d.name}</strong> — ${d.restaurant} — ${d.price} ₽
+            <div style="margin-top: 8px;">
+                <a href="/dishes/${d.id}/edit/">Редактировать</a> • 
+                <a href="/dishes/${d.id}/delete/">Удалить</a> • 
+                <a href="/dishes/${d.id}/review/">Оставить отзыв</a>
+            </div>
+        </div>
+    `).join('');
 }
 </script>
+
+</body>
+</html>

@@ -14,19 +14,19 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+# foodmap/foodmap/urls.py
+
 from django.contrib import admin
 from django.urls import path, include
-from django.http import HttpResponse
-def home(request):
-    return HttpResponse("""
-        <h1>Добро пожаловать в FoodMap!</h1>
-        <ul>
-            <li><a href="/admin/">Админка</a></li>
-            <li><a href="/restaurants/">Список ресторанов (пока пустой)</a></li>
-        </ul>
-    """)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
+    # ВСЁ ТВОЁ ПРИЛОЖЕНИЕ СРАЗУ НА КОРЕНЬ — это то, что ты хочешь!
+    path('', include('restaurants.urls')),
+    
+    # Если хочешь, чтобы старый адрес /restaurants/ тоже работал — оставь эту строку,
+    # она не мешает:
     path('restaurants/', include('restaurants.urls')),
 ]
 
