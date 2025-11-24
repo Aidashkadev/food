@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Удалить блюдо</title>
+    <style>
+        body { font-family: Arial; margin: 50px; background: #f9f9f9; }
+        .warning { color: red; font-size: 22px; font-weight: bold; }
+        button { padding: 12px 24px; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <h1>Удалить блюдо?</h1>
+    <p class="warning">Ты действительно хочешь удалить <strong>"{{ object.name }}"</strong>?</p>
+    <p>Это действие нельзя отменить!</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" style="background:red;color:white;">
+            Да, удалить навсегда
+        </button>
+    </form>
+
+    <br><br>
+    <a href="{% url 'restaurants:dish-list' %}">Отмена — вернуться к списку</a>
+    <br><br>
+    <a href="/">На главную</a>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!-- restaurants/templates/restaurants/dishes_list.html -->
+<!DOCTYPE html>
+<html>
+<head><title>Все блюда</title></head>
+<body>
+    <h1>Все блюда</h1>
+    <a href="{% url 'restaurants:dish-add' %}">+ Добавить новое блюдо</a><br><br>
+
+    {% for dish in object_list %}
+        <div style="border:1px solid #ccc; margin:10px; padding:10px;">
+            <strong>{{ dish.name }}</strong> — {{ dish.restaurant }} — {{ dish.price }} ₽
+            <br>
+            <a href="{% url 'restaurants:dish-edit' dish.pk %}">Редактировать</a> •
+            <a href="{% url 'restaurants:dish-delete' dish.pk %}">Удалить</a> •
+            <a href="{% url 'restaurants:add-review' dish.pk %}">Отзывы</a>
+        </div>
+    {% empty %}
+        <p>Пока нет ни одного блюда</p>
+    {% endfor %}
+
+    <br><a href="/">← На главную</a>
+</body>
+</html>

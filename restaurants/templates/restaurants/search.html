@@ -1,62 +1,72 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 min-h-screen">
 <head>
-    <meta charset="UTF-8">
-    <title>FoodMap — поиск блюд</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background: #f8f9fa; }
-        input[type=text] { padding: 12px; width: 300px; font-size: 18px; }
-        button { padding: 12px 20px; font-size: 18px; }
-        .crud { margin: 30px 0; padding: 20px; background: #e9ecef; border-radius: 10px; }
-        .result { margin: 15px 0; padding: 15px; background: white; border: 1px solid #ddd; border-radius: 8px; }
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FoodMap</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="text-white">
 
-<h1>Найди своё блюдо</h1>
+<div class="container mx-auto px-4 py-12 max-w-6xl">
 
-<input type="text" id="query" placeholder="пицца, борщ, суши..." autofocus>
-<button onclick="search()">Искать</button>
+    <h1 class="text-6xl font-black text-center mb-4 drop-shadow-lg">FoodMap</h1>
+    <p class="text-2xl text-center mb-12 opacity-90">Найди своё идеальное блюдо за секунду</p>
 
-<!-- КНОПКИ CRUD — ВОТ ОНИ! -->
-<div class="crud">
-    <h2>Управление</h2>
-    <a href="{% url 'restaurants:dish-add' %}">+ Добавить блюдо</a>  •  
-    <a href="{% url 'restaurants:dish-list' %}">Все блюда</a>
+    <!-- Поиск -->
+    <div class="flex justify-center gap-4 mb-10 flex-wrap">
+        <input type="text" id="query" placeholder="пицца • лагман • бургер • шашлык..."
+               class="px-8 py-5 rounded-full text-black text-xl w-full max-w-2xl shadow-2xl focus:outline-none focus:ring-4 focus:ring-white/50">
+        <button onclick="search()" class="px-10 py-5 bg-white text-purple-600 font-bold rounded-full text-xl shadow-2xl hover:bg-gray-100 transition">
+            Найти
+        </button>
+    </div>
+
+    <!-- Кнопки CRUD -->
+    <div class="flex justify-center gap-6 mb-12 flex-wrap">
+        <a href="{% url 'restaurants:dish-add' %}" class="px-8 py-4 bg-white/20 backdrop-blur-lg rounded-full font-bold text-lg hover:bg-white/30 transition shadow-xl">
+            + Добавить блюдо
+        </a>
+        <a href="{% url 'restaurants:dish-list' %}" class="px-8 py-4 bg-white/20 backdrop-blur-lg rounded-full font-bold text-lg hover:bg-white/30 transition shadow-xl">
+            Все блюда
+        </a>
+    </div>
+
+    <!-- Результаты -->
+    <div id="results" class="text-center text-xl">Начни поиск...</div>
 </div>
-
-<div id="results">Начни вводить название блюда...</div>
 
 <script>
 async function search() {
     const q = document.getElementById('query').value.trim();
     const div = document.getElementById('results');
-    
-    if (!q) {
-        div.innerHTML = 'Введите название блюда';
-        return;
-    }
+    if (!q) return;
 
     const resp = await fetch(`/search/?q=${encodeURIComponent(q)}`);
     const dishes = await resp.json();
 
-    if (dishes.length === 0) {
-        div.innerHTML = '<p style="color: red;">Ничего не найдено</p>';
-        return;
-    }
-
-    div.innerHTML = dishes.map(d => `
-        <div class="result">
-            <strong>${d.name}</strong> — ${d.restaurant} — ${d.price} ₽
-            <div style="margin-top: 8px;">
-                <a href="/dishes/${d.id}/edit/">Редактировать</a> • 
-                <a href="/dishes/${d.id}/delete/">Удалить</a> • 
-                <a href="/dishes/${d.id}/review/">Оставить отзыв</a>
-            </div>
-        </div>
-    `).join('');
+    div.innerHTML = dishes.length === 0 
+        ? `<p class="text-3xl mt-20 opacity-80">😔 Ничего не найдено</p>`
+        : `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
+            ${dishes.map(d => `
+                <div class="bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl hover:scale-105 transition transform">
+                    <h3 class="text-3xl font-bold mb-3">${d.name}</h3>
+                    <p class="text-xl opacity-90 mb-2">Ресторан: <span class="font-bold">${d.restaurant}</span></p>
+                    <p class="text-4xl font-black text-yellow-400 mb-6">${d.price} ₽</p>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="/dishes/${d.id}/" class="px-5 py-3 bg-green-500 rounded-full font-bold hover:bg-green-400">Подробнее</a>
+                        <a href="/dishes/${d.id}/edit/" class="px-5 py-3 bg-blue-500 rounded-full font-bold hover:bg-blue-400">Редактировать</a>
+                        <a href="/dishes/${d.id}/delete/" class="px-5 py-3 bg-red-500 rounded-full font-bold hover:bg-red-400">Удалить</a>
+                    </div>
+                </div>
+            `).join('')}
+           </div>`;
 }
 </script>
-
 </body>
 </html>

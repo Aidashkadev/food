@@ -1,0 +1,27 @@
+<!-- restaurants/templates/restaurants/dish_detail.html -->
+<h1>{{ dish.name }}</h1>
+<p>Ресторан: {{ dish.restaurant.name }}</p>
+<p>Цена: {{ dish.price }} ₽</p>
+<p>{{ dish.description }}</p>
+
+<hr>
+<h3>Отзывы</h3>
+{% for review in reviews %}
+    <div style="border:1px solid #ddd; padding:10px; margin:10px 0;">
+        <strong>{{ review.user.username }}</strong> ({{ review.rating }}/5)
+        <p>{{ review.text }}</p>
+    </div>
+{% empty %}
+    <p>Пока нет отзывов</p>
+{% endfor %}
+
+<h3>Оставить отзыв</h3>
+<form method="post" action="{% url 'restaurants:add-review' dish.pk %}">
+    {% csrf_token %}
+    {{ review_form.as_p }}
+    <button type="submit">Отправить</button>
+</form>
+
+<br>
+<a href="/">← На главную</a> |
+<a href="{% url 'restaurants:dish-edit' dish.pk %}">Редактировать блюдо</a>

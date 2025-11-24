@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{% if form.instance.pk %}Редактировать{% else %}Добавить{% endif %} блюдо</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-500 to-purple-600 min-h-screen flex items-center justify-center p-6">
+<div class="bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-10 max-w-2xl w-full">
+    <h1 class="text-4xl font-bold text-center mb-8 text-purple-600">
+        {% if form.instance.pk %}Редактировать{% else %}Добавить новое{% endif %} блюдо
+    </h1>
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        {{ form.as_p|safe }}
+        <div class="flex justify-center gap-6">
+            <button type="submit" class="px-10 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold rounded-full text-xl shadow-lg hover:shadow-2xl transition">
+                Сохранить
+            </button>
+            <a href="/" class="px-10 py-4 bg-gray-500 text-white font-bold rounded-full text-xl hover:bg-gray-600 transition">
+                Отмена
+            </a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

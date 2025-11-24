@@ -1,51 +1,66 @@
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView, CreateView, UpdateView, DeleteView, DetailView
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
+from .models import Dish, Review
+from .forms import DishForm, ReviewForm
+
 
 class SearchPage(TemplateView):
     template_name = "restaurants/search.html"
 
-from .models import Review
-from .forms import ReviewForm
-
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
-from .models import Dish
-from .forms import DishForm
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 class OwnerRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.groups.filter(name='Owner').exists()
 
+
 class DishListView(LoginRequiredMixin, ListView):
     model = Dish
-    template_name = 'dishes/list.html'
+    template_name = 'restaurants/dishes_list.html'
 
-class DishCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
+
+class DishCreateView(LoginRequiredMixin, CreateView):
     model = Dish
     form_class = DishForm
-    template_name = 'dishes/form.html'
-    success_url = reverse_lazy('dish-list')
+    template_name = 'restaurants/dishes_form.html'
+    success_url = reverse_lazy('restaurants:dish-list')    # ← дефис!
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
         return super().form_valid(form)
 
-class DishUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
+
+class DishUpdateView(LoginRequiredMixin, UpdateView):
     model = Dish
     form_class = DishForm
-    template_name = 'dishes/form.html'
-    success_url = reverse_lazy('dish-list')
+    template_name = 'restaurants/dishes_form.html'
+    success_url = reverse_lazy('restaurants:dish-list')    # ← дефис!
 
-class DishDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
+
+class DishDeleteView(LoginRequiredMixin, DeleteView):
     model = Dish
-    template_name = 'dishes/confirm_delete.html'
-    success_url = reverse_lazy('dish-list')
+    template_name = 'restaurants/dishes_confirm_delete.html'
+    success_url = reverse_lazy('restaurants:dish-list')    # ← дефис!
+
+
+# ← ВНИМАНИЕ: ЭТОТ КЛАСС ДОЛЖЕН БЫТЬ НА ТОМ ЖЕ УРОВНЕ, НЕ ВНУТРИ ДРУГОГО!
+class DishDetailView(LoginRequiredMixin, DetailView):
+    model = Dish
+    template_name = 'restaurants/dish_detail.html'
+    context_object_name = 'dish'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['reviews'] = self.object.reviews.all()
+        context['review_form'] = ReviewForm()
+        return context
 
 
 class ReviewCreateView(LoginRequiredMixin, CreateView):
     model = Review
     form_class = ReviewForm
-    template_name = 'reviews/form.html'
+    template_name = 'restaurants/reviews_form.html'
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -53,4 +68,5 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('dish-detail', kwargs={'pk': self.kwargs['dish_id']})
+        return reverse_lazy('restaurants:dish-detail', kwargs={'pk': self.kwargs['dish_id']})
+        # ← дефис и правильно!
