@@ -1,12 +1,26 @@
 from django import forms
-from .models import Dish, Review
+from .models import RestaurantDish, Dish
 
-class DishForm(forms.ModelForm):
-    class Meta:
-        model = Dish
-        fields = ['name', 'description', 'price', 'restaurant']
+class DishCreateForm(forms.ModelForm):
+    dish_name = forms.CharField(max_length=200, label="Название блюда")
 
-class ReviewForm(forms.ModelForm):
     class Meta:
-        model = Review
-        fields = ['text']
+        model = RestaurantDish
+        fields = ['dish_name', 'description', 'price', 'ingredients']
+
+    def save(self, commit=True, restaurant=None):
+        # создаём или получаем Dish
+        dish_name = self.cleaned_data['dish_name']
+        dish, created = Dish.objects.get_or_create(name=dish_name)
+
+        # создаём RestaurantDish
+        restaurant_dish = super().save(commit=False)
+        restaurant_dish.dish = dish
+        if restaurant:
+            restaurant_dish.restaurant = restaurant
+
+        if commit:
+            restaurant_dish.save()
+            self.save_m2m()
+
+        return restaurant_dish
