@@ -1,8 +1,8 @@
 
-from django.contrib.auth.models import AbstractUser
+
 from django.db import models
 from django.contrib.auth.models import User
-from django.conf import settings
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -37,7 +37,7 @@ class Dish(models.Model):
         return f"{self.name} — {self.restaurant.name}"
 
 
-class Review(models.Model):     # ← ЭТО ОБЯЗАТЕЛЬНО ДОЛЖНО БЫТЬ!
+class Review(models.Model):
     dish = models.ForeignKey(Dish, on_delete=models.CASCADE, related_name='reviews')
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
@@ -46,3 +46,5 @@ class Review(models.Model):     # ← ЭТО ОБЯЗАТЕЛЬНО ДОЛЖНО
 
     def __str__(self):
         return f"{self.author} — {self.rating}★"
+    
+

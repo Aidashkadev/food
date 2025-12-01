@@ -9,4 +9,6 @@ class DishForm(forms.ModelForm):
 class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
-        fields = ['text']
+        fields = ['text', 'rating']
+
+from django.contrib.auth.forms import UserCreationForm

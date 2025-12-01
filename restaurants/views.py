@@ -29,6 +29,9 @@ class DishCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.owner = self.request.user
         return super().form_valid(form)
+    
+    def test_func(self):
+        return self.request.user.is_staff
 
 
 class DishUpdateView(LoginRequiredMixin, UpdateView):
@@ -37,13 +40,17 @@ class DishUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'restaurants/dishes_form.html'
     success_url = reverse_lazy('restaurants:dish-list')    # ← дефис!
 
-
+    def test_func(self):
+        return self.request.user.is_staff
+    
 class DishDeleteView(LoginRequiredMixin, DeleteView):
     model = Dish
     template_name = 'restaurants/dishes_confirm_delete.html'
     success_url = reverse_lazy('restaurants:dish-list')    # ← дефис!
 
-
+    def test_func(self):
+        return self.request.user.is_staff
+    
 # ← ВНИМАНИЕ: ЭТОТ КЛАСС ДОЛЖЕН БЫТЬ НА ТОМ ЖЕ УРОВНЕ, НЕ ВНУТРИ ДРУГОГО!
 class DishDetailView(LoginRequiredMixin, DetailView):
     model = Dish
@@ -63,10 +70,13 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
     template_name = 'restaurants/reviews_form.html'
 
     def form_valid(self, form):
-        form.instance.user = self.request.user
+        form.instance.author = self.request.user  # обязательно author, не user
         form.instance.dish_id = self.kwargs['dish_id']
         return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('restaurants:dish-detail', kwargs={'pk': self.kwargs['dish_id']})
-        # ← дефис и правильно!
+
+ 
+
+

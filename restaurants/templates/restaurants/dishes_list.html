@@ -1,23 +1,89 @@
 <!-- restaurants/templates/restaurants/dishes_list.html -->
 <!DOCTYPE html>
-<html>
-<head><title>Все блюда</title></head>
-<body>
-    <h1>Все блюда</h1>
-    <a href="{% url 'restaurants:dish-add' %}">+ Добавить новое блюдо</a><br><br>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Все блюда</title>
 
-    {% for dish in object_list %}
-        <div style="border:1px solid #ccc; margin:10px; padding:10px;">
-            <strong>{{ dish.name }}</strong> — {{ dish.restaurant }} — {{ dish.price }} ₽
-            <br>
-            <a href="{% url 'restaurants:dish-edit' dish.pk %}">Редактировать</a> •
-            <a href="{% url 'restaurants:dish-delete' dish.pk %}">Удалить</a> •
-            <a href="{% url 'restaurants:add-review' dish.pk %}">Отзывы</a>
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#ff6a3d',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-100 text-gray-900">
+
+    <div class="max-w-3xl mx-auto py-10">
+
+        <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-brand">Все блюда</h1>
+
+            <a href="/"
+               class="px-4 py-2 bg-gray-800 text-white rounded-lg font-semibold text-sm hover:bg-gray-900 transition">
+                ← На главную
+            </a>
         </div>
-    {% empty %}
-        <p>Пока нет ни одного блюда</p>
-    {% endfor %}
 
-    <br><a href="/">← На главную</a>
+        <!-- Кнопка добавить -->
+        <a href="{% url 'restaurants:dish-add' %}"
+           class="inline-block mb-6 bg-brand text-white px-4 py-2 rounded-lg font-semibold hover:bg-orange-600 transition">
+            + Добавить новое блюдо
+        </a>
+
+        <!-- Список блюд -->
+        {% for dish in object_list %}
+            <div class="bg-white p-5 shadow-md rounded-xl mb-4">
+
+                <h2 class="text-xl font-semibold">{{ dish.name }}</h2>
+
+                <p class="text-gray-600 mt-1 text-sm">
+                    Ресторан:
+                    <span class="font-medium">{{ dish.restaurant }}</span>
+                </p>
+
+                <p class="text-gray-700 font-semibold mt-2">
+                    Цена: {{ dish.price }} ₽
+                </p>
+
+                <!-- КНОПКИ -->
+                <div class="mt-5 flex gap-3">
+
+                    <!-- Редактировать -->
+                    <a href="{% url 'restaurants:dish-edit' dish.pk %}"
+                       class="px-3 py-2 rounded-md bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition">
+                        ✏️ Редактировать
+                    </a>
+
+                    <!-- Удалить -->
+                    <a href="{% url 'restaurants:dish-delete' dish.pk %}"
+                       class="px-3 py-2 rounded-md bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition">
+                        🗑 Удалить
+                    </a>
+
+                    <!-- Отзывы -->
+                    <a href="{% url 'restaurants:add-review' dish.pk %}"
+                       class="px-3 py-2 rounded-md bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition">
+                        💬 Отзывы
+                    </a>
+
+                </div>
+
+            </div>
+        {% empty %}
+            <p class="text-gray-500 italic">Пока нет ни одного блюда…</p>
+        {% endfor %}
+
+    </div>
+
 </body>
 </html>

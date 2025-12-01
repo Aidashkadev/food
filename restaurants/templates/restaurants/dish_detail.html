@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ dish.name }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#ff6a3d',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-100 text-gray-900">
+
+<div class="max-w-3xl mx-auto py-10">
+
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-brand">{{ dish.name }}</h1>
+        <a href="/" class="px-4 py-2 bg-gray-800 text-white rounded-lg font-semibold text-sm hover:bg-gray-900 transition">
+            ← На главную
+        </a>
+    </div>
+
+    <!-- Информация о блюде -->
+    <div class="bg-white p-5 shadow-md rounded-xl mb-6">
+        <p class="text-gray-600 mt-1 text-sm">
+            Ресторан: <span class="font-medium">{{ dish.restaurant.name }}</span>
+        </p>
+        <p class="text-gray-700 font-semibold mt-2">
+            Цена: {{ dish.price }} ₽
+        </p>
+        <p class="text-gray-700 mt-2">{{ dish.description }}</p>
+
+        <!-- КНОПКИ -->
+        <div class="mt-5 flex gap-3">
+            <a href="{% url 'restaurants:dish-edit' dish.pk %}"
+               class="px-3 py-2 rounded-md bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition">
+                ✏️ Редактировать
+            </a>
+
+            <a href="{% url 'restaurants:dish-delete' dish.pk %}"
+               class="px-3 py-2 rounded-md bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition">
+                🗑 Удалить
+            </a>
+        </div>
+    </div>
+
+    <!-- Отзывы -->
+    <div class="bg-white p-5 shadow-md rounded-xl mb-6">
+        <h2 class="text-xl font-bold mb-4 text-brand">Отзывы</h2>
+        {% if reviews %}
+            <div class="space-y-4">
+                {% for review in reviews %}
+                    <div class="border border-gray-300 rounded-xl p-4 bg-white">
+                        <p class="font-semibold">{{ review.user.username }} — {{ review.rating }}/5</p>
+                        <p class="text-gray-700">{{ review.text }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-gray-500 italic">Пока нет отзывов…</p>
+        {% endif %}
+    </div>
+
+    <!-- Форма добавления отзыва -->
+    {% if user.is_authenticated %}
+    <div class="bg-white p-5 shadow-md rounded-xl mb-6">
+        <h2 class="text-xl font-bold mb-4 text-brand">Оставить отзыв</h2>
+        <form method="post" action="{% url 'restaurants:add-review' dish.pk %}" class="space-y-4">
+            {% csrf_token %}
+            {{ review_form.as_p|safe }}
+            <button type="submit"
+                    class="px-4 py-2 bg-brand text-white rounded-lg font-semibold hover:bg-orange-600 transition">
+                Отправить
+            </button>
+        </form>
+    </div>
+    {% else %}
+        <p class="text-gray-500 italic mb-6">Войдите, чтобы оставить отзыв.</p>
+    {% endif %}
+
+</div>
+
+</body>
+</html>
